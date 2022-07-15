@@ -44,5 +44,5 @@
 
     redraw() {}
   }
-  customElements.define("pl-com-proholding-gauge", LpGauge);
+  customElements.define("pl-com-proholding-gauge", LpGauges);
 })();

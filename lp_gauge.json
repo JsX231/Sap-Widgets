@@ -1,0 +1,284 @@
+{
+  "id": "pl.com.proholding.gauge",
+  "version": "0.0.1",
+  "name": "LPGauge",
+  "description": "SAP Cloud Widget LP-Gauge",
+  "newInstancePrefix": "LpGauge",
+  "icon": "https://widgets.nkappler.de/datepicker/docs/calendarBlue.svg",
+  "vendor": "Proholding",
+  "eula": "End-user license agreement text",
+  "license": "",
+  "webcomponents": [
+    {
+      "kind": "main",
+      "tag": "nkappler-date-picker",
+      "url": "https://widgets.nkappler.de/datepicker/releases/2.4.0/webcomponent.js",
+      "integrity": "sha256-9MgyPpg9G9x7XaLdnAZ3C+WRz4cx4TsGU8zqHG8c5Do="
+    },
+    {
+      "kind": "styling",
+      "tag": "nkappler-datepicker-aps",
+      "url": "https://widgets.nkappler.de/datepicker/releases/2.4.0/aps_webcomponent.js",
+      "integrity": "sha256-6MYNO1naW//DpyKcy3bFp2P6AVhATfZAhe+t4cxWzaU="
+    }
+  ],
+  "properties": {
+    "dateVal": {
+      "type": "Date",
+      "description": "default (start) date"
+    },
+    "secondDateVal": {
+      "type": "Date",
+      "description": "default end date"
+    },
+    "format": {
+      "type": "string",
+      "description": "date format",
+      "default": ""
+    },
+    "darktheme": {
+      "type": "boolean",
+      "default": false
+    },
+    "enablerange": {
+      "type": "boolean",
+      "default": false
+    },
+    "minDateVal": {
+      "type": "Date",
+      "description": "The minimum Date value that can be selected. (optional)"
+    },
+    "maxDateVal": {
+      "type": "Date",
+      "description": "The maximum Date value that can be selected. (optional)"
+    },
+    "width": {
+      "type": "integer",
+      "default": 300
+    },
+    "height": {
+      "type": "integer",
+      "default": 300
+    },
+    "margin_left": {
+      "type": "integer",
+      "default": 40
+    },
+    "margin_top": {
+      "type": "integer",
+      "default": 40
+    },
+    "minValue": {
+      "type": "number",
+      "description": "Min Value",
+      "default": -7
+    },
+    "maxValue": {
+      "type": "number",
+      "description": "Max Value",
+      "default": 31
+    },
+    "actualValue": {
+      "type": "number",
+      "description": "Actual Value",
+      "default": 14
+    },
+    "firstPoint": {
+      "type": "integer",
+      "description": "First Point",
+      "default": 10
+    },
+    "secondPoint": {
+      "type": "integer",
+      "description": "Second Point",
+      "default": 23
+    },
+    "isZoneByPercent": {
+      "type": "boolean",
+      "description": "Disabled",
+      "default": false
+    },
+    "firstZone": {
+      "type": "integer",
+      "description": "First Zone",
+      "default": 50
+    },
+    "secondZone": {
+      "type": "integer",
+      "description": "Second Zone",
+      "default": 10
+    },
+    "thirdZone": {
+      "type": "integer",
+      "description": "Third Zone",
+      "default": 40
+    },
+    "title": {
+      "description": "Title",
+      "type": "string",
+      "default": "Lp_Gauge"
+    },
+    "isValVisible": {
+      "description": "Show Values",
+      "type": "boolean",
+      "default": true
+    },
+    "isColorfulPointer": {
+      "description": "Colorful Pointer",
+      "type": "boolean",
+      "default": true
+    },
+    "firstZoneColor": {
+      "type": "string",
+      "description": "First Zone Color",
+      "default": "#FF0000"
+    },
+    "secondZoneColor": {
+      "type": "string",
+      "description": "Second Zone Color",
+      "default": "#00B050"
+    },
+    "thirdZoneColor": {
+      "type": "string",
+      "description": "Third Zone Color",
+      "default": "#FFFF00"
+    },
+    "majorTicks": {
+      "type": "integer",
+      "description": "Major Ticks Nbr",
+      "default": 5
+    },
+    "minorTicks": {
+      "type": "integer",
+      "description": "Minor Ticks Nbr",
+      "default": 2
+    }
+  },
+  "methods": {
+    "getDateVal": {
+      "returnType": "Date",
+      "description": "get the date. (start date if range selection is enabled)",
+      "parameters": [],
+      "body": "return this.dateVal;"
+    },
+    "setDateVal": {
+      "description": "set the date. (start date if range selection is enabled)",
+      "parameters": [
+        {
+          "name": "dv",
+          "type": "Date",
+          "description": "The new date"
+        }
+      ],
+      "body": "this.dateVal = dv;"
+    },
+    "getSecondDateVal": {
+      "returnType": "Date",
+      "description": "get the end date. (returns undefined if range selection is not enabled)",
+      "parameters": [],
+      "body": " var x = new Date(); x = undefined; if (this.enablerange) { return this.secondDateVal; } else { return x; }"
+    },
+    "setSecondDateVal": {
+      "description": "set the end date. (has no effect if range selection is not enabled)",
+      "parameters": [
+        {
+          "name": "dv",
+          "type": "Date",
+          "description": "The new date"
+        }
+      ],
+      "body": "this.secondDateVal = dv;"
+    },
+    "isRangeEnabled": {
+      "description": "Returns whether range selection is enabled",
+      "parameters": [],
+      "body": "return this.enablerange;",
+      "returnType": "boolean"
+    },
+    "getMinimumDateVal": {
+      "returnType": "Date",
+      "description": "get the date minimum. (might return undefined if value is not set)",
+      "parameters": [],
+      "body": "return this.minDateVal || undefined;"
+    },
+    "setMinimumDateVal": {
+      "description": "set the date minimum.",
+      "parameters": [
+        {
+          "name": "dv",
+          "type": "Date",
+          "description": "The new minimum date"
+        }
+      ],
+      "body": "this.minDateVal = dv;"
+    },
+    "clearMinimumDateVal": {
+      "description": "clear the date minimum.",
+      "body": "this.minDateVal = undefined;"
+    },
+    "getMaximumDateVal": {
+      "returnType": "Date",
+      "description": "get the date maximum. (might return undefined if value is not set)",
+      "parameters": [],
+      "body": "return this.maxDateVal || undefined;"
+    },
+    "setMaximumDateVal": {
+      "description": "set the date maximum.",
+      "parameters": [
+        {
+          "name": "dv",
+          "type": "Date",
+          "description": "The new minimum date"
+        }
+      ],
+      "body": "this.maxDateVal = dv;"
+    },
+    "clearMaximumDateVal": {
+      "description": "clear the date maximum.",
+      "body": "this.maxDateVal = undefined;"
+    },
+    "setMinValue": {
+      "description": "Sets min value of gauge.",
+      "parameters": [
+        {
+          "name": "newValue",
+          "type": "number",
+          "description": "The displayed min value of the gauge."
+        }
+      ],
+      "body": "this.minValue = newValue;"
+    },
+    "setMaxValue": {
+      "description": "Sets max value of gauge.",
+      "parameters": [
+        {
+          "name": "newValue",
+          "type": "number",
+          "description": "The displayed max value of the gauge."
+        }
+      ],
+      "body": "this.maxValue = newValue;"
+    },
+    "setActualValue": {
+      "description": "Sets actual value of gauge.",
+      "parameters": [
+        {
+          "name": "newValue",
+          "type": "number",
+          "description": "The displayed actual value of the gauge."
+        }
+      ],
+      "body": "this.actualValue = newValue;"
+    },
+    "getActualValue": {
+      "returnType": "number",
+      "description": "Returns actualGauge value.",
+      "body": "return this.actualValue;"
+    }
+  },
+  "events": {
+    "onClick": {
+      "description": "Called when the user clicks the Box."
+    }
+  }
+}

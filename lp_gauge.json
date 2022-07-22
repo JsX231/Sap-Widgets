@@ -15,6 +15,20 @@
       "url": "http://localhost:8080/lp_gauge.js",
       "integrity": "",
       "ignoreIntegrity": true
+    },
+    {
+      "kind": "styling",
+      "tag": "ph-gauge-styling",
+      "url": "http://localhost:8080/lp_gauge_styling.js",
+      "integrity": "",
+      "ignoreIntegrity": true
+    },
+    {
+      "kind": "builder",
+      "tag": "ph-gauge-builder",
+      "url": "http://localhost:8080/lp_gauge_builder.js",
+      "integrity": "",
+      "ignoreIntegrity": true
     }
   ],
   "properties": {

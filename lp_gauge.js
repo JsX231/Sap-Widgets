@@ -40,6 +40,9 @@
           "firstZone",
           "secondZone",
           "thirdZone",
+          "firstZoneColor",
+          "secondZoneColor",
+          "thirdZoneColor",
           "minValue",
           "maxValue",
           "actualValue",
@@ -56,6 +59,7 @@
 
         _propsAffectOnPointer = [
           "isColorfulPointer",
+          "isValVisible",
           ...this._propsAffectOnBands,
         ];
 
@@ -153,7 +157,7 @@
         }
 
         _drawBands() {
-          this._svgGroup.selectAll(".band").remove();
+          this._svgBandsGroup.selectAll("*").remove();
           for (let index in this._gaugeConfig.redZones) {
             if (
               this._gaugeConfig.actual >=
@@ -197,9 +201,7 @@
         }
 
         _drawTicks() {
-          this._svgGroup
-            .selectAll(".minor-ticks,.major-ticks,.tick-value")
-            .remove();
+          this._svgTicksGroup.selectAll("*").remove();
           const valueFontSize = Math.round(this._svgLayoutConfig.size / 16);
           const majorDelta =
             parseInt(
@@ -223,7 +225,7 @@
               const point1 = this._valueToPoint(minor, 0.75);
               const point2 = this._valueToPoint(minor, 0.85);
 
-              this._svgGroup
+              this._svgTicksGroup
                 .append("svg:line")
                 .attr("x1", point1.x)
                 .attr("y1", point1.y)
@@ -234,7 +236,7 @@
             const point1 = this._valueToPoint(major, 0.7);
             const point2 = this._valueToPoint(major, 0.85);
 
-            this._svgGroup
+            this._svgTicksGroup
               .append("svg:line")
               .attr("x1", point1.x)
               .attr("y1", point1.y)
@@ -248,7 +250,7 @@
             ) {
               const point = this._valueToPoint(major, 0.63);
 
-              this._svgGroup
+              this._svgTicksGroup
                 .append("svg:text")
                 .attr("x", point.x)
                 .attr("class", "tick-value")
@@ -265,11 +267,12 @@
         }
 
         _drawPointer() {
-          this._svgGroup.select(".pro_viz_ext_gauge_pointerContainer").remove();
+          this._svgPointerGroup.selectAll("*").remove();
 
-          const pointerContainer = this._svgGroup
-            .append("svg:g")
-            .attr("class", "pro_viz_ext_gauge_pointerContainer");
+          const pointerContainer = this._svgPointerGroup.attr(
+            "class",
+            "pro_viz_ext_gauge_pointerContainer"
+          );
 
           const midValue = (this._gaugeConfig.min + this._gaugeConfig.max) / 2;
 
@@ -319,23 +322,26 @@
         }
 
         _redrawPointer(value, transitionDuration) {
-          const pointerContainer = this._svgGroup.select(
-            ".pro_viz_ext_gauge_pointerContainer"
-          );
-          if (this._props.isValVisible)
-            pointerContainer
-              .selectAll("text")
-              .transition()
-              .duration(transitionDuration)
-              .ease(_d3.easeLinear)
-              .tween("text", function () {
-                const i = _d3.interpolate(this.textContent, value);
-                return function (t) {
-                  this.textContent = Math.round(i(t));
-                };
-              });
+          this._svgPointerGroup
+            .selectAll("text")
+            .style("display", this._props.isValVisible ? "unset" : "none")
+            .transition()
+            .duration(transitionDuration)
+            .ease(_d3.easeLinear)
+            .tween("text", function () {
+              const i = _d3.interpolate(this.textContent, value);
+              return function (t) {
+                this.textContent = Math.round(i(t));
+              };
+            });
 
-          const pointer = pointerContainer.selectAll("path");
+          const pointer = this._svgPointerGroup.selectAll("path");
+
+          pointer.style(
+            "fill",
+            this._props.isColorfulPointer ? this._gaugeConfig.pointerColor : ""
+          );
+
           pointer
             .transition()
             .duration(
@@ -401,25 +407,34 @@
               .attr("cy", this._svgLayoutConfig.centerY)
               .attr("r", 0.9 * this._svgLayoutConfig.radius)
               .attr("class", "inner-circle");
+
+            this._svgTitle = this._svgGroup
+              .append("svg:text")
+              .attr("id", "title");
+            this._svgBandsGroup = this._svgGroup
+              .append("g")
+              .attr("id", "bands");
+            this._svgTicksGroup = this._svgGroup
+              .append("g")
+              .attr("id", "ticks");
+            this._svgPointerGroup = this._svgGroup
+              .append("g")
+              .attr("id", "pointer");
           }
 
-          // Label draw
           if (
             this._checkAttributesInObj(["title", "isValVisible"], updatedProps)
           ) {
-            this._svgGroup.select(".label").remove();
-            if (this._props["isValVisible"]) {
-              const fontSize = Math.round(this._svgLayoutConfig.size / 10.5);
-              this._svgGroup
-                .append("svg:text")
-                .attr("x", this._svgLayoutConfig.centerX)
-                .attr("y", this._svgLayoutConfig.centerY - fontSize * 2)
-                .attr("dy", fontSize / 2)
-                .attr("text-anchor", "middle")
-                .attr("class", "label")
-                .text(this._gaugeConfig.label)
-                .style("font-size", fontSize + "px");
-            }
+            const fontSize = Math.round(this._svgLayoutConfig.size / 10.5);
+            this._svgTitle
+              .attr("x", this._svgLayoutConfig.centerX)
+              .attr("y", this._svgLayoutConfig.centerY - fontSize * 2)
+              .attr("dy", fontSize / 2)
+              .attr("text-anchor", "middle")
+              .attr("class", "label")
+              .text(this._gaugeConfig.label)
+              .style("font-size", fontSize + "px")
+              .style("display", this._props.isValVisible ? "unset" : "none");
           }
 
           if (
@@ -470,7 +485,7 @@
             return;
           }
 
-          this._svgGroup
+          this._svgBandsGroup
             .append("svg:path")
             .attr("class", "band")
             .style("fill", color)

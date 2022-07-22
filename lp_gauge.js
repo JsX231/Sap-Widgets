@@ -30,52 +30,10 @@
 
   d3script.onload = () => {
     const _d3 = d3;
-    const testProps = {
-      firstPoint: 10,
-      secondPoint: 23,
-      firstZone: 50,
-      secondZone: 10,
-      thirdZone: 40,
-      isColorfulPointer: true,
-      firstZoneColor: "#FF0000",
-      secondZoneColor: "#00B050",
-      thirdZoneColor: "#FFFF00",
-      widgetName: "LpGauge_1",
-      designMode: true,
-      mobileMode: false,
-      margin_left: 40,
-      margin_top: 40,
-      minValue: -7,
-      maxValue: 31,
-      actualValue: 14,
-      isZoneByPercent: false,
-      title: "Lp_Gauge",
-      isValVisible: true,
-      majorTicks: 5,
-      minorTicks: 2,
-      onClick: false,
-    };
 
     customElements.define(
       "ph-gauge",
       class LpGauge extends HTMLElement {
-        //First redraw queue counter:1
-        //when the custom widget is added to the canvas or the analytic application is opened.
-        constructor() {
-          super();
-          this._shadowRoot = this.attachShadow({ mode: "open" });
-          this._shadowRoot.appendChild(template.content.cloneNode(true));
-          this._afterFirstConnection = false;
-          this.addEventListener("click", async (event) => {
-            this.dispatchEvent(new Event("onClick"));
-          });
-          this._props = {};
-          this._gaugeConfig = {
-            transitionDuration: 500,
-            pointerColor: "yellow",
-          };
-        }
-
         _propsAffectOnBands = [
           "firstPoint",
           "secondPoint",
@@ -96,19 +54,39 @@
           "isValVisible",
         ];
 
+        _propsAffectOnPointer = [
+          "isColorfulPointer",
+          ...this._propsAffectOnBands,
+        ];
+
+        //First redraw queue counter:1
+        //when the custom widget is added to the canvas or the analytic application is opened.
+        constructor() {
+          super();
+          this._shadowRoot = this.attachShadow({ mode: "open" });
+          this._shadowRoot.appendChild(template.content.cloneNode(true));
+          this._afterFirstConnection = false;
+          this.addEventListener("click", async (event) => {
+            this.dispatchEvent(new Event("onClick"));
+          });
+          this._props = {};
+          this._gaugeConfig = {
+            transitionDuration: 500,
+            pointerColor: "yellow",
+          };
+        }
+
         //First redraw queue counter:5
         //called when component rendered for the first time or when it's dragged
         connectedCallback() {
-          this._afterFirstConnection = true;
           this._divRootD3 = _d3.select(this._shadowRoot).select("#root");
-
           this._svgContainer = this._divRootD3
             .append("svg:svg")
             .attr("width", "100%")
             .attr("height", "100%");
-
           this._initLayout(this.offsetWidth, this.offsetHeight);
           this._redraw(this._props);
+          this._afterFirstConnection = true;
         }
 
         //First redraw queue counter:2
@@ -137,7 +115,15 @@
         // implement only if u need it/Yes i need it
         onCustomWidgetResize(width, height) {
           this._initLayout(width, height);
+          this._afterFirstConnection = false;
           this._redraw(this._props);
+          this._afterFirstConnection = true;
+        }
+
+        onCustomWidgetDestroy() {}
+
+        disconnectedCallback() {
+          this._divRootD3.selectAll("svg").remove();
         }
 
         _initLayout(width, height) {
@@ -164,12 +150,6 @@
             centerY: height / 2 - padding.bottom + padding.top,
             padding,
           };
-        }
-
-        onCustomWidgetDestroy() {}
-
-        disconnectedCallback() {
-          this._divRootD3.selectAll("svg").remove();
         }
 
         _drawBands() {
@@ -284,6 +264,118 @@
           }
         }
 
+        _drawPointer() {
+          this._svgGroup.select(".pro_viz_ext_gauge_pointerContainer").remove();
+
+          const pointerContainer = this._svgGroup
+            .append("svg:g")
+            .attr("class", "pro_viz_ext_gauge_pointerContainer");
+
+          const midValue = (this._gaugeConfig.min + this._gaugeConfig.max) / 2;
+
+          const pointerPath = this._buildPointerPath(midValue);
+
+          const pointerLine = _d3
+            .line()
+            .x((d) => d.x)
+            .y((d) => d.y)
+            .curve(_d3.curveBasis);
+
+          const pointer = pointerContainer
+            .selectAll("path")
+            .data([pointerPath])
+            .enter()
+            .append("svg:path")
+            .attr("d", pointerLine)
+            .attr("class", "pointer");
+
+          if (this._props.isColorfulPointer)
+            pointer.style("fill", this._gaugeConfig.pointerColor);
+
+          pointerContainer
+            .append("svg:circle")
+            .attr("cx", this._svgLayoutConfig.centerX)
+            .attr("cy", this._svgLayoutConfig.centerY)
+            .attr("r", 0.12 * this._svgLayoutConfig.radius)
+            .attr("class", "pointer-pin");
+
+          const valueFontSize = Math.round(this._svgLayoutConfig.size / 10);
+          pointerContainer
+            .selectAll("text")
+            .data([midValue])
+            .enter()
+            .append("svg:text")
+            .attr("x", this._svgLayoutConfig.centerX)
+            .attr("y", this._svgLayoutConfig.centerY + valueFontSize * 3)
+            .attr("dy", valueFontSize / 2)
+            .attr("text-anchor", "middle")
+            .style("font-size", valueFontSize + "px");
+
+          this._redrawPointer(this._gaugeConfig.min);
+          setTimeout(
+            () => this._redrawPointer(this._gaugeConfig.actual, 3000),
+            1000
+          );
+        }
+
+        _redrawPointer(value, transitionDuration) {
+          const pointerContainer = this._svgGroup.select(
+            ".pro_viz_ext_gauge_pointerContainer"
+          );
+          if (this._props.isValVisible)
+            pointerContainer
+              .selectAll("text")
+              .transition()
+              .duration(transitionDuration)
+              .ease(_d3.easeLinear)
+              .tween("text", function () {
+                const i = _d3.interpolate(this.textContent, value);
+                return function (t) {
+                  this.textContent = Math.round(i(t));
+                };
+              });
+
+          const pointer = pointerContainer.selectAll("path");
+          pointer
+            .transition()
+            .duration(
+              undefined !== transitionDuration
+                ? transitionDuration
+                : this._gaugeConfig.transitionDuration
+            )
+            //			.delay(0)
+            //			.ease("linear")
+            //			.attr("transform", function(d)
+            .attrTween("transform", () => {
+              let pointerValue = value;
+              if (value > this._gaugeConfig.max) {
+                pointerValue =
+                  this._gaugeConfig.max + 0.02 * this._gaugeConfig.range;
+              } else if (value < this._gaugeConfig.min) {
+                pointerValue =
+                  this._gaugeConfig.min - 0.02 * this._gaugeConfig.range;
+              }
+              const targetRotation = this._valueToDegrees(pointerValue) - 90;
+              const currentRotation =
+                this._gaugeConfig.currentRotation || targetRotation;
+              this._gaugeConfig.currentRotation = targetRotation;
+
+              return (step) => {
+                const rotation =
+                  currentRotation + (targetRotation - currentRotation) * step;
+                return (
+                  "translate(" +
+                  this._svgLayoutConfig.centerX +
+                  ", " +
+                  this._svgLayoutConfig.centerY +
+                  ") rotate(" +
+                  rotation +
+                  ")"
+                );
+              };
+            });
+        }
+
         _checkAttributesInObj(attributes, targetObj) {
           return attributes.some((item) => item in targetObj);
         }
@@ -311,18 +403,6 @@
               .attr("class", "inner-circle");
           }
 
-          if (
-            this._checkAttributesInObj(this._propsAffectOnBands, updatedProps)
-          ) {
-            this._drawBands();
-          }
-
-          if (
-            this._checkAttributesInObj(this._propsAffectOnTicks, updatedProps)
-          ) {
-            this._drawTicks();
-          }
-
           // Label draw
           if (
             this._checkAttributesInObj(["title", "isValVisible"], updatedProps)
@@ -342,56 +422,47 @@
             }
           }
 
-          // var pointerContainer = svgBody
-          //   .append("svg:g")
-          //   .attr("class", "pro_viz_ext_gauge_pointerContainer");
+          if (
+            this._checkAttributesInObj(this._propsAffectOnBands, updatedProps)
+          ) {
+            this._drawBands();
+          }
 
-          // var midValue = (gaugeConfig.min + gaugeConfig.max) / 2;
+          if (
+            this._checkAttributesInObj(this._propsAffectOnTicks, updatedProps)
+          ) {
+            this._drawTicks();
+          }
 
-          // var pointerPath = buildPointerPath(midValue);
+          if (
+            this._checkAttributesInObj(this._propsAffectOnPointer, updatedProps)
+          ) {
+            if (this._afterFirstConnection)
+              this._redrawPointer(this._gaugeConfig.actual, 1000);
+            else this._drawPointer();
+          }
+        }
 
-          // var pointerLine = d3.svg
-          //   .line()
-          //   .x(function (d) {
-          //     return d.x;
-          //   })
-          //   .y(function (d) {
-          //     return d.y;
-          //   })
-          //   .interpolate("basis");
+        _buildPointerPath(value) {
+          const delta = this._gaugeConfig.range / 13;
 
-          // var pointer = pointerContainer
-          //   .selectAll("path")
-          //   .data([pointerPath])
-          //   .enter()
-          //   .append("svg:path")
-          //   .attr("d", pointerLine)
-          //   .attr("class", "pointer");
+          const pointerValueToPoint = (value, factor) => {
+            const point = this._valueToPoint(value, factor);
+            point.x -= this._svgLayoutConfig.centerX;
+            point.y -= this._svgLayoutConfig.centerY;
+            return point;
+          };
 
-          // if (isColorfulPointer)
-          //   pointer.style("fill", gaugeConfig.pointerColor);
+          const head = pointerValueToPoint(value, 0.85);
+          const head1 = pointerValueToPoint(value - delta, 0.12);
+          const head2 = pointerValueToPoint(value + delta, 0.12);
 
-          // pointerContainer
-          //   .append("svg:circle")
-          //   .attr("cx", gaugeConfig.centerX)
-          //   .attr("cy", gaugeConfig.centerY)
-          //   .attr("r", 0.12 * gaugeConfig.radius)
-          //   .attr("class", "pointer-pin");
-
-          // fontSize = Math.round(gaugeConfig.size / 10);
-          // pointerContainer
-          //   .selectAll("text")
-          //   .data([midValue])
-          //   .enter()
-          //   .append("svg:text")
-          //   .attr("x", gaugeConfig.centerX)
-          //   .attr("y", gaugeConfig.centerY + fontSize * 3)
-          //   .attr("dy", fontSize / 2)
-          //   .attr("text-anchor", "middle")
-          //   .style("font-size", fontSize + "px");
-
-          // redrawPointer(gaugeConfig.min);
-          // setTimeout(redrawPointer, 1000, gaugeConfig.actual);
+          const tailValue =
+            value - (this._gaugeConfig.range * (1 / (270 / 360))) / 2;
+          const tail = pointerValueToPoint(tailValue, 0.28);
+          const tail1 = pointerValueToPoint(tailValue - delta, 0.12);
+          const tail2 = pointerValueToPoint(tailValue + delta, 0.12);
+          return [head, head1, tail2, tail, tail1, head2, head];
         }
 
         _drawBand(start, end, color) {
@@ -405,7 +476,7 @@
             .style("fill", color)
             .attr(
               "d",
-              d3
+              _d3
                 .arc()
                 .innerRadius(0.65 * this._svgLayoutConfig.radius)
                 .outerRadius(0.85 * this._svgLayoutConfig.radius)

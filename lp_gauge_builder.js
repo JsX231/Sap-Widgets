@@ -130,14 +130,14 @@
           .querySelectorAll('input[name="zoneGroupRadio"]')
           .forEach((radioInput) => {
             radioInput.addEventListener("change", (event) => {
-              this._changeZoneSettersVisibility(event.target.value === "true");
+              this._changeZoneSettersVisibility();
               this._submit(event);
             });
           });
       }
 
-      _changeZoneSettersVisibility(inputValue) {
-        if (inputValue) {
+      _changeZoneSettersVisibility() {
+        if (this._shadowRoot.getElementById("byPercent").checked) {
           this._shadowRoot
             .getElementById("zoneByPercentSetters")
             .style.removeProperty("display");
@@ -170,14 +170,11 @@
         if (newIsZoneByPercent)
           this._shadowRoot.getElementById("byPercent").checked = true;
         else this._shadowRoot.getElementById("byValue").checked = true;
-        this._changeZoneSettersVisibility(newIsZoneByPercent);
+        this._changeZoneSettersVisibility();
       }
 
       get isZoneByPercent() {
-        return (
-          this._shadowRoot.querySelector('input[name="zoneGroupRadio"]:checked')
-            .value === "true"
-        );
+        return this._shadowRoot.getElementById("byPercent").checked;
       }
     }
   );

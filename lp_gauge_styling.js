@@ -2,60 +2,62 @@
   let template = document.createElement("template");
   template.innerHTML = `
     <style>
-       h3 { font-weight:normal; }
-    .propsContainer{
+      h3 {
+        font-weight: normal;
+      }
+      .styling_propsContainer {
         margin-bottom: 10px;
         color: #333;
-    }
+      }
 
-    .inputContainer{
+      .styling_inputContainer {
         display: flex;
         align-items: center;
         margin-top: 7px;
-    }
+      }
 
-    .inputContainer input {
+      .styling_inputContainer input {
         margin-right: 5px;
-    }
+      }
 
-    .propsContainer input[type="color"] {
+      .styling_propsContainer input[type="color"] {
         border: none;
         width: 42px;
         margin: 0;
-    }
+      }
     </style>
-    <div id="root_props">
-    <h3>Visibility</h3>
-    <div class="propsContainer">
-        <input type="checkbox" id="isValVisible">
+    <div id="root_style-props">
+      <h3>Visibility</h3>
+      <div class="styling_propsContainer">
+        <input type="checkbox" id="isValVisible" />
         <label for="isValVisible">Show values and title</label>
-    </div>
-    <div class="propsContainer">
-        <input type="checkbox" id="isColorfulPointer">
+      </div>
+      <div class="styling_propsContainer">
+        <input type="checkbox" id="isColorfulPointer" />
         <label for="isColorfulPointer">Colorful pointer</label>
-    </div>
-    <h3>Zones color <small>(from left to right)</small>
-    </h3>
-    <div class="propsContainer">
-        <label>First zone color</label>
-        <div class="inputContainer">
-        <input id="firstZoneColorValue" type="text" size="10" />
-        <input id="firstZoneColor" type="color" />
+      </div>
+      <h3>Zones color <small>(from left to right)</small></h3>
+      <div class="styling_propsContainer">
+        <label for="firstZoneColorValue">First zone color</label>
+        <div class="styling_inputContainer">
+          <input id="firstZoneColorValue" type="text" size="10" />
+          <input id="firstZoneColor" type="color" />
         </div>
-    </div>
-    <div class="propsContainer">
-        <label>Second zone color</label>
-        <div class="inputContainer">
-        <input id="secondZoneColorValue" type="text" size="10" />
-        <input id="secondZoneColor" type="color" />
+      </div>
+      <div class="styling_propsContainer">
+        <label for="secondZoneColorValue">Second zone color</label>
+        <div class="styling_inputContainer">
+          <input id="secondZoneColorValue" type="text" size="10" />
+          <input id="secondZoneColor" type="color" />
         </div>
-    </div>
-    <div class="propsContainer">
-        <label>Third zone color</label>
-        <div class="inputContainer">
-        <input id="thirdZoneColorValue" type="text" size="10" />
-        <input id="thirdZoneColor" type="color" />
+      </div>
+      <div class="styling_propsContainer">
+        <label for="thirdZoneColorValue">Third zone color</label>
+        <div class="styling_inputContainer">
+          <input id="thirdZoneColorValue" type="text" size="10" />
+          <input id="thirdZoneColor" type="color" />
         </div>
+      </div>
     </div>`;
 
   customElements.define(
@@ -78,7 +80,6 @@
           this._shadowRoot
             .getElementById(id)
             .addEventListener("change", (event) => {
-              event.preventDefault();
               if (id.includes("Value"))
                 this[id.replace("Value", "")] = event.target.value;
               else this[id] = event.target.value;
@@ -134,7 +135,6 @@
           newSecondZoneColor;
       }
       set thirdZoneColor(newThirdZoneColor) {
-        console.log("ChangeTo:", newThirdZoneColor);
         this._shadowRoot.getElementById("thirdZoneColor").value =
           newThirdZoneColor;
         this._shadowRoot.getElementById("thirdZoneColorValue").value =
@@ -155,14 +155,6 @@
       get thirdZoneColor() {
         return this._shadowRoot.getElementById("thirdZoneColor").value;
       }
-
-      //   set color(newColor) {
-      //     this._shadowRoot.getElementById("styling_color").value = newColor;
-      //   }
-
-      //   get color() {
-      //     return this._shadowRoot.getElementById("styling_color").value;
-      //   }
     }
   );
 })();

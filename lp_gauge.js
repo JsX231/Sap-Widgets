@@ -97,6 +97,7 @@
         //After update queue counter:1
         // before the properties of the custom widget are updated.
         onCustomWidgetBeforeUpdate(oChangedProperties) {
+          console.log("Changed", oChangedProperties);
           this._props = { ...this._props, ...oChangedProperties };
         }
 
@@ -532,24 +533,34 @@
         }
 
         _processProperties(props) {
-          if ("minValue" in props) {
-            const gaugeMin = props["minValue"];
+          if (
+            this._checkAttributesInObj(["minValue", "isZoneByPercent"], props)
+          ) {
+            const gaugeMin = props["minValue"] || this._gaugeConfig.min;
             this._gaugeConfig.min = parseInt(gaugeMin.toFixed());
             if (this._gaugeConfig.max)
               this._gaugeConfig.range =
                 this._gaugeConfig.max - this._gaugeConfig.min;
           }
-          if ("maxValue" in props) {
-            let gaugeMax = props["maxValue"];
-            if (gaugeMax < +this._gaugeConfig.min) {
+          if (
+            this._checkAttributesInObj(["maxValue", "isZoneByPercent"], props)
+          ) {
+            let gaugeMax = props["maxValue"] || this._gaugeConfig.max;
+            if (gaugeMax <= this._gaugeConfig.min) {
               gaugeMax = this._gaugeConfig.min + 1;
             }
             this._gaugeConfig.max = parseInt(gaugeMax.toFixed());
             this._gaugeConfig.range =
               this._gaugeConfig.max - this._gaugeConfig.min;
           }
-          if ("actualValue" in props) {
-            const gaugeActual = props["actualValue"];
+          if (
+            this._checkAttributesInObj(
+              ["actualValue", "isZoneByPercent"],
+              props
+            )
+          ) {
+            const gaugeActual =
+              props["actualValue"] || this._gaugeConfig.actual;
             this._gaugeConfig.actual = parseInt(gaugeActual.toFixed());
           }
 

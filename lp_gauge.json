@@ -4,7 +4,7 @@
   "name": "LPGauge",
   "description": "SAP Cloud Widget LP-Gauge",
   "newInstancePrefix": "LpGauge",
-  "icon": "http://localhost:8080/lp_gauge.png",
+  "icon": "https://jsx231.github.io/Sap-Widgets/lp_gauge.png",
   "vendor": "Proholding",
   "eula": "End-user license agreement text",
   "license": "",
@@ -12,21 +12,21 @@
     {
       "kind": "main",
       "tag": "ph-gauge",
-      "url": "http://localhost:8080/lp_gauge.js",
+      "url": "https://jsx231.github.io/Sap-Widgets/lp_gauge.js",
       "integrity": "",
       "ignoreIntegrity": true
     },
     {
       "kind": "styling",
       "tag": "ph-gauge-styling",
-      "url": "http://localhost:8080/lp_gauge_styling.js",
+      "url": "https://jsx231.github.io/Sap-Widgets/lp_gauge_styling.js",
       "integrity": "",
       "ignoreIntegrity": true
     },
     {
       "kind": "builder",
       "tag": "ph-gauge-builder",
-      "url": "http://localhost:8080/lp_gauge_builder.js",
+      "url": "https://jsx231.github.io/Sap-Widgets/lp_gauge_builder.js",
       "integrity": "",
       "ignoreIntegrity": true
     }

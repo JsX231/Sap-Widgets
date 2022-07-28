@@ -132,6 +132,11 @@
       "type": "integer",
       "description": "Minor Ticks Nbr",
       "default": 2
+    },
+    "css": {
+      "type": "string",
+      "description": "Styling classes",
+      "default": ""
     }
   },
   "methods": {

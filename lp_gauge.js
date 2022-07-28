@@ -8,25 +8,51 @@
   let template = document.createElement("template");
   template.innerHTML = `
       <div id="root">
-      <style>
+      <style id="root_styleComponent">
         #root {
-          width:100%;
-          height: 100%;
-        }
-        .gauge {fill:#e5e5e5;stroke-width:0px;font-family:Helvetica} 
-        .gauge .outer-circle {fill:#ffffff;stroke:#353535;stroke-width:0.5px}
-        .gauge .inner-circle {fill:#ffffff;stroke:#e0e0e0;stroke-width:2px}
-        .gauge .minor-ticks {stroke:#e5e5e5;stroke-width:1px}
-        .gauge .major-ticks {stroke:#e5e5e5;stroke-width:2px}
-        .gauge .pointer {fill:#FFFF00;stroke:#eaeaea;stroke-width:1;fill-opacity 1}
-        .gauge .pointer-pin {fill:#FFD700;stroke:#fff;opacity:1}
+  width:100%;
+  height: 100%;
+}
+.gauge {
+  fill:#000000;
+  stroke-width:0px;
+  font-family:Helvetica;
+} 
+.gauge .outer-circle {
+  fill:rgb(52,75,109);
+  stroke:rgb(52,75,109);
+  stroke-width:2px;
+}
+.gauge .inner-circle {
+  fill:#ebffe7;
+  stroke:#e0e0e0;
+  stroke-width:2px;
+}
+.gauge .minor-ticks {
+  stroke:#000000;
+  stroke-width:1px;
+}
+.gauge .major-ticks {
+  stroke:#000000;
+  stroke-width:2px;
+}
+.gauge .pointer {
+  fill:rgb(255,0,0);
+  stroke:#eaeaea;
+  fill-opacity: 1;
+  opacity:1;
+  stroke-width:1;
+}
+.gauge .pointer-pin {
+  fill:rgb(150,168,195);
+  stroke:#fff;
+  opacity:1;
+}
 
-        .gauge .first-color{ fill: #FF0000}
-        .gauge .second-color{ fill: #00B050}
-        .gauge .third-color{ fill: #FFFF00}
-      </style>
-      </div>
-    `;
+.gauge #first-color{ fill:  rgb(255,0,0); }
+.gauge #second-color{ fill: rgb(0,176,80);}
+.gauge #third-color{ fill: rgb(255,255,0);}
+`;
 
   d3script.onload = () => {
     const _d3 = d3;
@@ -47,6 +73,7 @@
           "maxValue",
           "actualValue",
           "isZoneByPercent",
+          "css",
         ];
 
         _propsAffectOnTicks = [
@@ -70,8 +97,9 @@
           this._shadowRoot = this.attachShadow({ mode: "open" });
           this._shadowRoot.appendChild(template.content.cloneNode(true));
           this._afterFirstConnection = false;
-          this.addEventListener("click", async (event) => {
-            this.dispatchEvent(new Event("onClick"));
+          this.addEventListener("click", (event) => {
+            var event = new Event("onClick");
+            this.dispatchEvent(event);
           });
           this._props = {};
           this._gaugeConfig = {
@@ -97,7 +125,6 @@
         //After update queue counter:1
         // before the properties of the custom widget are updated.
         onCustomWidgetBeforeUpdate(oChangedProperties) {
-          console.log("Changed", oChangedProperties);
           this._props = { ...this._props, ...oChangedProperties };
         }
 
@@ -159,45 +186,57 @@
 
         _drawBands() {
           this._svgBandsGroup.selectAll("*").remove();
+          const firstZoneId = "first-color";
+          const secondZoneId = "second-color";
+          const thirdZoneId = "third-color";
           for (let index in this._gaugeConfig.redZones) {
+            this._drawBand(
+              this._gaugeConfig.redZones[index].from,
+              this._gaugeConfig.redZones[index].to,
+              this._props.firstZoneColor,
+              firstZoneId
+            );
             if (
               this._gaugeConfig.actual >=
                 this._gaugeConfig.redZones[index].from &&
               this._gaugeConfig.actual < this._gaugeConfig.redZones[index].to
             )
-              this._gaugeConfig.pointerColor = this._props.firstZoneColor;
-            this._drawBand(
-              this._gaugeConfig.redZones[index].from,
-              this._gaugeConfig.redZones[index].to,
-              this._props.firstZoneColor
-            );
+              this._gaugeConfig.pointerColor =
+                this._props.firstZoneColor ||
+                this._svgBandsGroup.select(`#${firstZoneId}`).style("fill");
           }
 
           for (let index in this._gaugeConfig.greenZones) {
+            this._drawBand(
+              this._gaugeConfig.greenZones[index].from,
+              this._gaugeConfig.greenZones[index].to,
+              this._props.secondZoneColor,
+              secondZoneId
+            );
             if (
               this._gaugeConfig.actual >=
                 this._gaugeConfig.greenZones[index].from &&
               this._gaugeConfig.actual < this._gaugeConfig.greenZones[index].to
             )
-              this._gaugeConfig.pointerColor = this._props.secondZoneColor;
-            this._drawBand(
-              this._gaugeConfig.greenZones[index].from,
-              this._gaugeConfig.greenZones[index].to,
-              this._props.secondZoneColor
-            );
+              this._gaugeConfig.pointerColor =
+                this._props.secondZoneColor ||
+                this._svgBandsGroup.select(`#${secondZoneId}`).style("fill");
           }
 
           for (let index in this._gaugeConfig.yellowZones) {
+            this._drawBand(
+              this._gaugeConfig.yellowZones[index].from,
+              this._gaugeConfig.yellowZones[index].to,
+              this._props.thirdZoneColor,
+              thirdZoneId
+            );
             if (
               this._gaugeConfig.actual >=
               this._gaugeConfig.yellowZones[index].from
             )
-              this._gaugeConfig.pointerColor = this._props.thirdZoneColor;
-            this._drawBand(
-              this._gaugeConfig.yellowZones[index].from,
-              this._gaugeConfig.yellowZones[index].to,
-              this._props.thirdZoneColor
-            );
+              this._gaugeConfig.pointerColor =
+                this._props.thirdZoneColor ||
+                this._svgBandsGroup.select(`#${thirdZoneId}`).style("fill");
           }
         }
 
@@ -423,6 +462,11 @@
               .attr("id", "pointer");
           }
 
+          if ("css" in updatedProps && updatedProps["css"].length) {
+            this._shadowRoot.getElementById("root_styleComponent").innerHTML =
+              updatedProps["css"];
+          }
+
           if (
             this._checkAttributesInObj(["title", "isValVisible"], updatedProps)
           ) {
@@ -481,14 +525,15 @@
           return [head, head1, tail2, tail, tail1, head2, head];
         }
 
-        _drawBand(start, end, color) {
+        _drawBand(start, end, color, id) {
           if (0 >= end - start) {
             return;
           }
 
           this._svgBandsGroup
             .append("svg:path")
-            .attr("class", "band")
+            .attr("class", `band`)
+            .attr("id", id)
             .style("fill", color)
             .attr(
               "d",
@@ -536,16 +581,26 @@
           if (
             this._checkAttributesInObj(["minValue", "isZoneByPercent"], props)
           ) {
-            const gaugeMin = props["minValue"] || this._gaugeConfig.min;
+            const gaugeMin =
+              props["minValue"] === undefined
+                ? this._gaugeConfig.min
+                : props["minValue"];
             this._gaugeConfig.min = parseInt(gaugeMin.toFixed());
-            if (this._gaugeConfig.max)
+            if (this._gaugeConfig.max) {
+              if (this._gaugeConfig.max <= this._gaugeConfig.min)
+                this._gaugeConfig.max = this._gaugeConfig.min + 1;
+
               this._gaugeConfig.range =
                 this._gaugeConfig.max - this._gaugeConfig.min;
+            }
           }
           if (
             this._checkAttributesInObj(["maxValue", "isZoneByPercent"], props)
           ) {
-            let gaugeMax = props["maxValue"] || this._gaugeConfig.max;
+            let gaugeMax =
+              props["maxValue"] === undefined
+                ? this._gaugeConfig.max
+                : props["maxValue"];
             if (gaugeMax <= this._gaugeConfig.min) {
               gaugeMax = this._gaugeConfig.min + 1;
             }
@@ -560,12 +615,15 @@
             )
           ) {
             const gaugeActual =
-              props["actualValue"] || this._gaugeConfig.actual;
+              props["actualValue"] === undefined
+                ? this._gaugeConfig.actual
+                : props["actualValue"];
             this._gaugeConfig.actual = parseInt(gaugeActual.toFixed());
           }
 
           if ("title" in props && props["title"].length)
             this._gaugeConfig.label = props["title"];
+
           if ("majorTicks" in props) {
             let majorTicks = props["majorTicks"];
             if (majorTicks < 2) majorTicks = 2;

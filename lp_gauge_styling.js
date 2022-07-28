@@ -1,7 +1,52 @@
 (function () {
   let template = document.createElement("template");
+
+  const gaugeStyles = `#root {
+  width:100%;
+  height: 100%;
+}
+.gauge {
+  fill:#000000;
+  stroke-width:0px;
+  font-family:Helvetica;
+} 
+.gauge .outer-circle {
+  fill:rgb(52,75,109);
+  stroke:rgb(52,75,109);
+  stroke-width:2px;
+}
+.gauge .inner-circle {
+  fill:#ebffe7;
+  stroke:#e0e0e0;
+  stroke-width:2px;
+}
+.gauge .minor-ticks {
+  stroke:#000000;
+  stroke-width:1px;
+}
+.gauge .major-ticks {
+  stroke:#000000;
+  stroke-width:2px;
+}
+.gauge .pointer {
+  fill:rgb(255,0,0);
+  stroke:#eaeaea;
+  fill-opacity: 1;
+  opacity:1;
+  stroke-width:1;
+}
+.gauge .pointer-pin {
+  fill:rgb(150,168,195);
+  stroke:#fff;
+  opacity:1;
+}
+
+.gauge #first-color{ fill:  rgb(255,0,0); }
+.gauge #second-color{ fill: rgb(0,176,80);}
+.gauge #third-color{ fill: rgb(255,255,0);}`;
+
   template.innerHTML = `
-    <style>
+    <style id="styling_styleComponent">
       h3 {
         font-weight: normal;
       }
@@ -58,6 +103,14 @@
           <input id="thirdZoneColor" type="color" />
         </div>
       </div>
+      <div class="styling_propsContainer">
+        <label for="cssEditor">Css Editor</label>
+        <div class="styling_inputContainer">
+          <textarea id="cssEditor" rows="25" style="width:100%;">${gaugeStyles}</textarea>
+        </div>
+        <button id="saveCss">Save</button>
+        <button id="resetCss">Reset to defaults</button>
+      </div>
     </div>`;
 
   customElements.define(
@@ -67,6 +120,16 @@
         super();
         this._shadowRoot = this.attachShadow({ mode: "open" });
         this._shadowRoot.appendChild(template.content.cloneNode(true));
+        this._shadowRoot
+          .getElementById("saveCss")
+          .addEventListener("click", this._submit.bind(this));
+        this._shadowRoot
+          .getElementById("resetCss")
+          .addEventListener("click", (event) => {
+            event.preventDefault();
+            this._shadowRoot.getElementById("cssEditor").value = gaugeStyles;
+          });
+
         const changeZoneColorElementsId = [
           "firstZoneColor",
           "secondZoneColor",
@@ -108,12 +171,12 @@
                 firstZoneColor: this.firstZoneColor,
                 secondZoneColor: this.secondZoneColor,
                 thirdZoneColor: this.thirdZoneColor,
+                css: this.css,
               },
             },
           })
         );
       }
-
       set isValVisible(newIsValVisible) {
         this._shadowRoot.getElementById("isValVisible").checked =
           newIsValVisible;
@@ -147,13 +210,16 @@
         return this._shadowRoot.getElementById("isColorfulPointer").checked;
       }
       get firstZoneColor() {
-        return this._shadowRoot.getElementById("firstZoneColor").value;
+        return this._shadowRoot.getElementById("firstZoneColorValue").value;
       }
       get secondZoneColor() {
-        return this._shadowRoot.getElementById("secondZoneColor").value;
+        return this._shadowRoot.getElementById("secondZoneColorValue").value;
       }
       get thirdZoneColor() {
-        return this._shadowRoot.getElementById("thirdZoneColor").value;
+        return this._shadowRoot.getElementById("thirdZoneColorValue").value;
+      }
+      get css() {
+        return this._shadowRoot.getElementById("cssEditor").value;
       }
     }
   );

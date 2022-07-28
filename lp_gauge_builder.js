@@ -116,12 +116,36 @@
             </div>
           </div>
         </div>
+        <div class="builder_propsGroup">
+          <h3>Ticks</h3>
+          <div class="builder_propsContainer">
+            <label for="majorTicks">Major Ticks Nbr :</label>
+            <input id="majorTicks" type="number" size="10" />
+          </div>
+          <div class="builder_propsContainer">
+            <label for="minorTicks">Minor Ticks Nbr :</label>
+            <input id="minorTicks" type="number" size="10" />
+          </div>
+        </div>
       </fieldset>
     </div>`;
 
   customElements.define(
     "ph-gauge-builder",
     class LpGaugeBuilderPanel extends HTMLElement {
+      _inputsId = [
+        "minValue",
+        "maxValue",
+        "actualValue",
+        "firstPoint",
+        "secondPoint",
+        "firstZone",
+        "secondZone",
+        "thirdZone",
+        "majorTicks",
+        "minorTicks",
+      ];
+
       constructor() {
         super();
         this._shadowRoot = this.attachShadow({ mode: "open" });
@@ -134,6 +158,11 @@
               this._submit(event);
             });
           });
+        this._inputsId.forEach((id) =>
+          this._shadowRoot
+            .getElementById(id)
+            .addEventListener("change", this._submit.bind(this))
+        );
       }
 
       _changeZoneSettersVisibility() {
@@ -160,9 +189,127 @@
             detail: {
               properties: {
                 isZoneByPercent: this.isZoneByPercent,
+                minValue: this.minValue,
+                maxValue: this.maxValue,
+                actualValue: this.actualValue,
+                firstPoint: this.firstPoint,
+                secondPoint: this.secondPoint,
+                firstZone: this.firstZone,
+                secondZone: this.secondZone,
+                thirdZone: this.thirdZone,
+                minorTicks: this.minorTicks,
+                majorTicks: this.majorTicks,
               },
             },
           })
+        );
+      }
+
+      _stringToNumber(value) {
+        const parsed = parseInt(value);
+        if (isNaN(parsed)) {
+          return 0;
+        }
+        return parsed;
+      }
+
+      set minorTicks(newMinorTicks) {
+        this._shadowRoot.getElementById("minorTicks").value = newMinorTicks;
+      }
+
+      get minorTicks() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("minorTicks").value
+        );
+      }
+
+      set majorTicks(newMajorTicks) {
+        this._shadowRoot.getElementById("majorTicks").value = newMajorTicks;
+      }
+
+      get majorTicks() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("majorTicks").value
+        );
+      }
+
+      set minValue(newMinValue) {
+        this._shadowRoot.getElementById("minValue").value = newMinValue;
+      }
+
+      get minValue() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("minValue").value
+        );
+      }
+
+      set maxValue(newMaxValue) {
+        this._shadowRoot.getElementById("maxValue").value = newMaxValue;
+      }
+
+      get maxValue() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("maxValue").value
+        );
+      }
+
+      set actualValue(newActualValue) {
+        this._shadowRoot.getElementById("actualValue").value = newActualValue;
+      }
+
+      get actualValue() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("actualValue").value
+        );
+      }
+
+      set firstPoint(newFirstPoint) {
+        this._shadowRoot.getElementById("firstPoint").value = newFirstPoint;
+      }
+
+      get firstPoint() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("firstPoint").value
+        );
+      }
+
+      set secondPoint(newSecondPoint) {
+        this._shadowRoot.getElementById("secondPoint").value = newSecondPoint;
+      }
+
+      get secondPoint() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("secondPoint").value
+        );
+      }
+
+      set firstZone(newFirstZone) {
+        this._shadowRoot.getElementById("firstZone").value = newFirstZone;
+      }
+
+      get firstZone() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("firstZone").value
+        );
+      }
+
+      set secondZone(newSecondZone) {
+        this._shadowRoot.getElementById("secondZone").value = newSecondZone;
+      }
+
+      get secondZone() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("secondZone").value
+        );
+      }
+
+      set thirdZone(newThirdZone) {
+        this._shadowRoot.getElementById("thirdZone").value = newThirdZone;
+      }
+
+      get thirdZone() {
+        return this._stringToNumber(
+          this._shadowRoot.getElementById("thirdZone").value
         );
       }
 

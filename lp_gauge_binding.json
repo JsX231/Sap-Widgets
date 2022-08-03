@@ -1,0 +1,196 @@
+{
+  "id": "pl.com.proholding.gauge.binding",
+  "version": "0.0.1",
+  "name": "LPGaugeBinding",
+  "description": "SAP Cloud Widget LP-Gauge",
+  "newInstancePrefix": "LpGaugeBinding",
+  "icon": "https://jsx231.github.io/Sap-Widgets/lp_gauge.png",
+  "vendor": "Proholding",
+  "eula": "End-user license agreement text",
+  "license": "",
+  "webcomponents": [
+    {
+      "kind": "main",
+      "tag": "ph-gauge-binding",
+      "url": "https://jsx231.github.io/Sap-Widgets/lp_gauge_binding.js",
+      "integrity": "",
+      "ignoreIntegrity": true
+    },
+    {
+      "kind": "styling",
+      "tag": "ph-gauge-styling-binding",
+      "url": "https://jsx231.github.io/Sap-Widgets/lp_gauge_styling_binding.js",
+      "integrity": "",
+      "ignoreIntegrity": true
+    }
+  ],
+  "properties": {
+    "width": {
+      "type": "integer",
+      "default": 300
+    },
+    "height": {
+      "type": "integer",
+      "default": 300
+    },
+    "margin_left": {
+      "type": "integer",
+      "default": 40
+    },
+    "margin_top": {
+      "type": "integer",
+      "default": 40
+    },
+    "minValue": {
+      "type": "number",
+      "description": "Min Value",
+      "default": 0
+    },
+    "maxValue": {
+      "type": "number",
+      "description": "Max Value",
+      "default": 100
+    },
+    "actualValue": {
+      "type": "number",
+      "description": "Actual Value",
+      "default": 14
+    },
+    "firstPoint": {
+      "type": "integer",
+      "description": "First Point",
+      "default": 10
+    },
+    "secondPoint": {
+      "type": "integer",
+      "description": "Second Point",
+      "default": 23
+    },
+    "isZoneByPercent": {
+      "type": "boolean",
+      "description": "Disabled",
+      "default": true
+    },
+    "firstZone": {
+      "type": "integer",
+      "description": "First Zone",
+      "default": 50
+    },
+    "secondZone": {
+      "type": "integer",
+      "description": "Second Zone",
+      "default": 10
+    },
+    "thirdZone": {
+      "type": "integer",
+      "description": "Third Zone",
+      "default": 40
+    },
+    "title": {
+      "description": "Title",
+      "type": "string",
+      "default": "Lp_Gauge"
+    },
+    "isValVisible": {
+      "description": "Show Values",
+      "type": "boolean",
+      "default": true
+    },
+    "isColorfulPointer": {
+      "description": "Colorful Pointer",
+      "type": "boolean",
+      "default": true
+    },
+    "firstZoneColor": {
+      "type": "string",
+      "description": "First Zone Color",
+      "default": "#FF0000"
+    },
+    "secondZoneColor": {
+      "type": "string",
+      "description": "Second Zone Color",
+      "default": "#00B050"
+    },
+    "thirdZoneColor": {
+      "type": "string",
+      "description": "Third Zone Color",
+      "default": "#FFFF00"
+    },
+    "majorTicks": {
+      "type": "integer",
+      "description": "Major Ticks Nbr",
+      "default": 11
+    },
+    "minorTicks": {
+      "type": "integer",
+      "description": "Minor Ticks Nbr",
+      "default": 10
+    },
+    "css": {
+      "type": "string",
+      "description": "Styling classes",
+      "default": ""
+    }
+  },
+  "methods": {
+    "setMinValue": {
+      "description": "Sets min value of gauge.",
+      "parameters": [
+        {
+          "name": "newValue",
+          "type": "number",
+          "description": "The displayed min value of the gauge."
+        }
+      ],
+      "body": "this.minValue = newValue;"
+    },
+    "setMaxValue": {
+      "description": "Sets max value of gauge.",
+      "parameters": [
+        {
+          "name": "newValue",
+          "type": "number",
+          "description": "The displayed max value of the gauge."
+        }
+      ],
+      "body": "this.maxValue = newValue;"
+    },
+    "setActualValue": {
+      "description": "Sets actual value of gauge.",
+      "parameters": [
+        {
+          "name": "newValue",
+          "type": "number",
+          "description": "The displayed actual value of the gauge."
+        }
+      ],
+      "body": "this.actualValue = newValue;"
+    },
+    "getActualValue": {
+      "returnType": "number",
+      "description": "Returns actualGauge value.",
+      "body": "return this.actualValue;"
+    }
+  },
+  "events": {
+    "onClick": {
+      "description": "Called when the user clicks the Box."
+    }
+  },
+  "dataBindings": {
+    "myDataBinding": {
+      "feeds": [
+        {
+          "id": "dimensions",
+          "description": "Dimensions",
+          "type": "dimension"
+        },
+        {
+          "id": "measures",
+          "description": "Measures (1-Min,2-Max,3-Actual). Look console for values.",
+          "type": "mainStructureMember"
+        }
+      ]
+    }
+  }
+}

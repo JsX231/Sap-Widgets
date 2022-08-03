@@ -114,7 +114,7 @@
     </div>`;
 
   customElements.define(
-    "ph-gauge-styling-local",
+    "ph-gauge-styling-binding",
     class LpGaugeStylingPanel extends HTMLElement {
       constructor() {
         super();
